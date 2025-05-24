@@ -15,6 +15,7 @@ interface ProductContextType {
   addProduct: (product: Omit<Product, 'id'>) => void;
   updateProduct: (id: string, product: Omit<Product, 'id'>) => void;
   deleteProduct: (id: string) => void;
+  categories: string[];
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -26,6 +27,17 @@ export const useProducts = () => {
   }
   return context;
 };
+
+const categories = [
+  'Stationery',
+  'Electronics', 
+  'Books & Learning Materials',
+  'Safety Equipment',
+  'Tools',
+  'Food & Snacks',
+  'Personal Care',
+  'Campus Accessories'
+];
 
 const initialProducts: Product[] = [
   {
@@ -73,8 +85,32 @@ const initialProducts: Product[] = [
     name: 'Student Handbook',
     price: 3500,
     image: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=400&fit=crop',
-    category: 'Books',
+    category: 'Books & Learning Materials',
     description: 'Official polytechnic student handbook and guide'
+  },
+  {
+    id: '7',
+    name: 'Energy Drink',
+    price: 800,
+    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=400&fit=crop',
+    category: 'Food & Snacks',
+    description: 'Refreshing energy drink for late study sessions'
+  },
+  {
+    id: '8',
+    name: 'Ballpoint Pens (Pack of 5)',
+    price: 1500,
+    image: 'https://images.unsplash.com/photo-1586952518485-11b180e92764?w=400&h=400&fit=crop',
+    category: 'Stationery',
+    description: 'High-quality ballpoint pens for everyday writing'
+  },
+  {
+    id: '9',
+    name: 'Campus ID Lanyard',
+    price: 2000,
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop',
+    category: 'Campus Accessories',
+    description: 'Durable lanyard for your student ID and keys'
   }
 ];
 
@@ -113,7 +149,8 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
       products,
       addProduct,
       updateProduct,
-      deleteProduct
+      deleteProduct,
+      categories
     }}>
       {children}
     </ProductContext.Provider>

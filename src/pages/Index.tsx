@@ -23,8 +23,8 @@ const Index = () => {
   const features = [
     {
       icon: ShoppingBag,
-      title: "Easy Shopping",
-      description: "Browse and order your campus essentials with just a few clicks"
+      title: "Campus Essentials",
+      description: "Browse learning materials, stationery, and campus necessities"
     },
     {
       icon: Clock,
@@ -33,7 +33,7 @@ const Index = () => {
     },
     {
       icon: Users,
-      title: "Student Friendly",
+      title: "Student Focused",
       description: "Designed specifically for polytechnic students"
     },
     {
@@ -64,7 +64,7 @@ const Index = () => {
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
-                Get everything you need for your polytechnic journey. No payments required - just order and collect!
+                Everything you need for your polytechnic journey - from learning materials and stationery to books, snacks, and campus essentials!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button 
