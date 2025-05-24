@@ -17,7 +17,7 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
   const [customerName, setCustomerName] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const { cartItems, getCartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, addOrder } = useAuth();
   const slipRef = useRef<HTMLDivElement>(null);
 
   const generateOrderId = () => {
@@ -47,17 +47,24 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
     const orderData = {
       id: orderId,
       customerName: user?.name || customerName,
+      customerEmail: user?.email || '',
       items: cartItems,
       total: getCartTotal(),
       timestamp: new Date().toISOString(),
       userAgent: getUserAgent(),
-      isSignedIn: !!user
+      isSignedIn: !!user,
+      status: 'pending' as const
     };
 
     // Save order to localStorage (simulating CSV storage)
     const existingOrders = JSON.parse(localStorage.getItem('polytechnic-orders') || '[]');
     existingOrders.push(orderData);
     localStorage.setItem('polytechnic-orders', JSON.stringify(existingOrders));
+
+    // Add order to user's history if signed in
+    if (user) {
+      addOrder(orderData);
+    }
 
     // Clear cart after successful order
     clearCart();
@@ -70,9 +77,42 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
     });
   };
 
-  const handleDownload = () => {
+  const handleDownloadAsImage = async () => {
     if (slipRef.current) {
-      // In a real implementation, this would generate a PDF
+      try {
+        // Use html2canvas to convert the slip to image
+        const html2canvas = (await import('html2canvas')).default;
+        const canvas = await html2canvas(slipRef.current, {
+          backgroundColor: '#ffffff',
+          scale: 2,
+          width: 350,
+          height: slipRef.current.scrollHeight,
+          useCORS: true
+        });
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.download = `order-slip-${generateOrderId()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        toast({
+          title: "Download started",
+          description: "Your order slip image is being downloaded.",
+        });
+      } catch (error) {
+        console.error('Error generating image:', error);
+        toast({
+          title: "Download failed",
+          description: "Could not generate image. Please try the print option.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const handlePrint = () => {
+    if (slipRef.current) {
       const printWindow = window.open('', '_blank');
       if (printWindow) {
         printWindow.document.write(`
@@ -80,8 +120,21 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
             <head>
               <title>Order Slip</title>
               <style>
-                body { font-family: monospace; padding: 20px; }
-                .slip { max-width: 300px; margin: 0 auto; }
+                body { 
+                  font-family: monospace; 
+                  padding: 20px; 
+                  margin: 0;
+                  background: white;
+                }
+                .slip { 
+                  max-width: 350px; 
+                  margin: 0 auto;
+                  background: white;
+                }
+                @media print {
+                  body { padding: 0; }
+                  .slip { max-width: 100%; }
+                }
               </style>
             </head>
             <body>
@@ -125,6 +178,7 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
             ref={slipRef}
             className="bg-white border-2 border-dashed border-gray-300 p-4 text-xs font-mono relative overflow-hidden"
             style={{ 
+              width: '350px',
               backgroundImage: `
                 repeating-linear-gradient(
                   45deg,
@@ -169,7 +223,18 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
                 <div>Time: {now.toLocaleTimeString()}</div>
                 <div>Customer: {user?.name || customerName || 'N/A'}</div>
                 {user?.email && <div>Email: {user.email}</div>}
-                {user && <div>Status: Signed In</div>}
+                {user && (
+                  <div className="flex items-center space-x-2 mt-2">
+                    <span>Status: Signed In</span>
+                    {user.profileImage && (
+                      <img
+                        src={user.profileImage}
+                        alt={user.name}
+                        className="w-8 h-8 rounded-full object-cover border"
+                      />
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Items */}
@@ -218,33 +283,42 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
-              onClick={handleDownload}
+              onClick={handleDownloadAsImage}
               className="flex-1"
             >
               <Download className="w-4 h-4 mr-2" />
-              Download
+              Save as Image
             </Button>
             <Button 
-              variant="outline"
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: 'Polytechnic Store Order',
-                    text: `Order ${orderId} - Total: ₦${getCartTotal().toLocaleString()}`
-                  });
-                } else {
-                  toast({
-                    title: "Share",
-                    description: "Share functionality is not available on this device.",
-                  });
-                }
-              }}
+              variant="outline" 
+              onClick={handlePrint}
               className="flex-1"
             >
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
+              <Download className="w-4 h-4 mr-2" />
+              Print
             </Button>
           </div>
+
+          <Button 
+            variant="outline"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'Polytechnic Store Order',
+                  text: `Order ${orderId} - Total: ₦${getCartTotal().toLocaleString()}`
+                });
+              } else {
+                toast({
+                  title: "Share",
+                  description: "Share functionality is not available on this device.",
+                });
+              }
+            }}
+            className="w-full"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            Share
+          </Button>
         </CardContent>
       </Card>
     </div>
