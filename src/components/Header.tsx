@@ -1,8 +1,7 @@
-
-import React from 'react';
-import { ShoppingCart, User, Store } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '../contexts/AuthContext';
+import React from "react";
+import { ShoppingCart, User, Store } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "../contexts/AuthContext";
 
 interface HeaderProps {
   onCartClick: () => void;
@@ -23,9 +22,11 @@ const Header = ({ onCartClick, onAuthClick, cartItemCount }: HeaderProps) => {
             </div>
             <div>
               <span className="font-bold text-2xl bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Polytechnic Store
+                AAP Store
               </span>
-              <p className="text-sm text-gray-500 hidden sm:block">Campus Essentials</p>
+              <p className="text-sm text-gray-500 hidden sm:block">
+                Campus Essentials
+              </p>
             </div>
           </div>
 
@@ -33,19 +34,21 @@ const Header = ({ onCartClick, onAuthClick, cartItemCount }: HeaderProps) => {
             {user ? (
               <div className="flex items-center space-x-3 bg-gray-50 rounded-2xl px-4 py-2">
                 {user.profileImage && (
-                  <img 
-                    src={user.profileImage} 
+                  <img
+                    src={user.profileImage}
                     alt={user.name}
                     className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
                   />
                 )}
                 <div className="hidden sm:block">
-                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {user.name}
+                  </p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={logout}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl"
                 >
