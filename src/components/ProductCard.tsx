@@ -42,7 +42,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4 pt-0">
         <span className="text-xl font-bold text-blue-600">
-          ${product.price.toFixed(2)}
+          ₦{product.price.toLocaleString()}
         </span>
         <Button onClick={handleAddToCart} size="sm">
           Add to Cart

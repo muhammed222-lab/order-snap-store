@@ -179,7 +179,7 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
                   <div key={item.id} className="mb-1">
                     <div className="flex justify-between">
                       <span className="truncate flex-1">{item.name}</span>
-                      <span>${item.price.toFixed(2)}</span>
+                      <span>₦{item.price.toLocaleString()}</span>
                     </div>
                     <div className="text-gray-600">Qty: {item.quantity}</div>
                   </div>
@@ -190,7 +190,7 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
               <div className="border-t border-gray-400 pt-2 mb-3">
                 <div className="flex justify-between font-bold">
                   <span>TOTAL:</span>
-                  <span>${getCartTotal().toFixed(2)}</span>
+                  <span>₦{getCartTotal().toLocaleString()}</span>
                 </div>
               </div>
 
@@ -230,7 +230,7 @@ const OrderSlipGenerator = ({ onClose }: OrderSlipGeneratorProps) => {
                 if (navigator.share) {
                   navigator.share({
                     title: 'Polytechnic Store Order',
-                    text: `Order ${orderId} - Total: $${getCartTotal().toFixed(2)}`
+                    text: `Order ${orderId} - Total: ₦${getCartTotal().toLocaleString()}`
                   });
                 } else {
                   toast({

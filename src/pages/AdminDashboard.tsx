@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Search, CheckCircle, XCircle, Store, LogOut } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Store, LogOut, Plus, Edit, Trash2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useProducts } from '../contexts/ProductContext';
+import ProductForm from '../components/ProductForm';
 
 interface Order {
   id: string;
@@ -26,7 +27,11 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [searchResult, setSearchResult] = useState<Order | null>(null);
   const [searchStatus, setSearchStatus] = useState<'idle' | 'found' | 'not-found' | 'fake'>('idle');
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
   const navigate = useNavigate();
+  
+  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
 
   useEffect(() => {
     // Check if admin is authenticated
@@ -83,6 +88,31 @@ const AdminDashboard = () => {
     window.open('/', '_blank');
   };
 
+  const handleEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setShowProductForm(true);
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      deleteProduct(productId);
+      toast({
+        title: "Product Deleted",
+        description: "Product has been removed from the store.",
+      });
+    }
+  };
+
+  const handleProductSubmit = (productData: any) => {
+    if (editingProduct) {
+      updateProduct(editingProduct.id, productData);
+    } else {
+      addProduct(productData);
+    }
+    setEditingProduct(null);
+    setShowProductForm(false);
+  };
+
   const pendingOrders = orders.filter(order => order.status !== 'completed');
   const completedOrders = orders.filter(order => order.status === 'completed');
 
@@ -108,8 +138,9 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs defaultValue="verify" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="verify">Verify Orders</TabsTrigger>
+            <TabsTrigger value="products">Manage Products ({products.length})</TabsTrigger>
             <TabsTrigger value="pending">Pending Orders ({pendingOrders.length})</TabsTrigger>
             <TabsTrigger value="completed">Completed Orders ({completedOrders.length})</TabsTrigger>
           </TabsList>
@@ -162,7 +193,7 @@ const AdminDashboard = () => {
                         <div>
                           <p><strong>Order ID:</strong> {searchResult.id}</p>
                           <p><strong>Customer:</strong> {searchResult.customerName}</p>
-                          <p><strong>Total:</strong> ${searchResult.total.toFixed(2)}</p>
+                          <p><strong>Total:</strong> ₦{searchResult.total.toLocaleString()}</p>
                           <p><strong>Date:</strong> {new Date(searchResult.timestamp).toLocaleString()}</p>
                         </div>
                         <div>
@@ -177,7 +208,7 @@ const AdminDashboard = () => {
                         <ul className="list-disc list-inside mt-2 space-y-1">
                           {searchResult.items.map(item => (
                             <li key={item.id}>
-                              {item.name} (Qty: {item.quantity}) - ${(item.price * item.quantity).toFixed(2)}
+                              {item.name} (Qty: {item.quantity}) - ₦{(item.price * item.quantity).toLocaleString()}
                             </li>
                           ))}
                         </ul>
@@ -205,6 +236,56 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="products" className="space-y-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Product Management</CardTitle>
+                <Button onClick={() => setShowProductForm(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Product
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {products.map(product => (
+                    <Card key={product.id} className="overflow-hidden">
+                      <div className="aspect-square overflow-hidden">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <CardContent className="p-4">
+                        <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
+                        <p className="text-xs text-gray-600 mb-1">{product.category}</p>
+                        <p className="font-bold text-blue-600 mb-2">₦{product.price.toLocaleString()}</p>
+                        <div className="flex space-x-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditProduct(product)}
+                            className="flex-1"
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="flex-1 text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="pending" className="space-y-4">
             {pendingOrders.length === 0 ? (
               <Card>
@@ -222,7 +303,7 @@ const AdminDashboard = () => {
                         <p className="text-sm text-gray-600">Order: {order.id}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">${order.total.toFixed(2)}</p>
+                        <p className="font-semibold">₦{order.total.toLocaleString()}</p>
                         <p className="text-sm text-gray-600">
                           {new Date(order.timestamp).toLocaleDateString()}
                         </p>
@@ -254,7 +335,7 @@ const AdminDashboard = () => {
                         <p className="text-sm text-gray-600">Order: {order.id}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">${order.total.toFixed(2)}</p>
+                        <p className="font-semibold">₦{order.total.toLocaleString()}</p>
                         <Badge variant="secondary" className="bg-green-100 text-green-800">
                           Completed
                         </Badge>
@@ -269,6 +350,18 @@ const AdminDashboard = () => {
             )}
           </TabsContent>
         </Tabs>
+
+        {showProductForm && (
+          <ProductForm
+            product={editingProduct}
+            onSubmit={handleProductSubmit}
+            onClose={() => {
+              setShowProductForm(false);
+              setEditingProduct(null);
+            }}
+            title={editingProduct ? 'Edit Product' : 'Add New Product'}
+          />
+        )}
       </div>
     </div>
   );

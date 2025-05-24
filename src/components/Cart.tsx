@@ -52,7 +52,7 @@ const Cart = ({ onClose, onGenerateOrderSlip }: CartProps) => {
                 />
                 <div className="flex-1">
                   <h4 className="font-medium">{item.name}</h4>
-                  <p className="text-sm text-gray-600">${item.price.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">₦{item.price.toLocaleString()}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -85,7 +85,7 @@ const Cart = ({ onClose, onGenerateOrderSlip }: CartProps) => {
         </CardContent>
         <div className="p-6 border-t">
           <div className="flex justify-between items-center mb-4">
-            <span className="text-lg font-semibold">Total: ${getCartTotal().toFixed(2)}</span>
+            <span className="text-lg font-semibold">Total: ₦{getCartTotal().toLocaleString()}</span>
           </div>
           <Button 
             onClick={onGenerateOrderSlip} 
