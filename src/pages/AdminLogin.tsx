@@ -16,7 +16,7 @@ const AdminLogin = () => {
     e.preventDefault();
     
     // Simple password check (in production, this would be more secure)
-    if (password === 'admin123') {
+    if (password === 'muhammed-admin') {
       localStorage.setItem('admin-authenticated', 'true');
       navigate('/admin/dashboard');
     } else {
@@ -29,41 +29,44 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-            <Lock className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+        <CardHeader className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+            <Lock className="w-8 h-8 text-white" />
           </div>
-          <CardTitle>Store Owner Access</CardTitle>
-          <p className="text-gray-600 text-sm">
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            Store Owner Access
+          </CardTitle>
+          <p className="text-gray-600 text-sm leading-relaxed">
             Enter the admin password to access the store management panel
           </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="password">Admin Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700">Admin Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter admin password"
+                className="h-12 border-2 border-gray-200 focus:border-blue-500 transition-colors"
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl">
               Access Admin Panel
             </Button>
           </form>
-          <div className="mt-4 text-center">
+          <div className="mt-6 text-center">
             <Button 
               variant="ghost" 
               onClick={() => navigate('/')}
-              className="text-sm"
+              className="text-sm text-gray-500 hover:text-gray-700"
             >
-              Back to Store
+              ← Back to Store
             </Button>
           </div>
         </CardContent>

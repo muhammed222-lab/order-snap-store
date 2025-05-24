@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
@@ -56,48 +56,59 @@ const UserAuth = ({ onClose }: UserAuthProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Sign In</CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 backdrop-blur-md">
+        <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-lg">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+              <User className="w-5 h-5 text-white" />
+            </div>
+            <CardTitle className="text-xl font-bold text-gray-900">Create Account</CardTitle>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-red-50 hover:text-red-600 rounded-xl">
             <X className="w-4 h-4" />
           </Button>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your full name"
+                className="h-12 border-2 border-gray-200 focus:border-blue-500 transition-colors"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
+                className="h-12 border-2 border-gray-200 focus:border-blue-500 transition-colors"
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="profileImage">Profile Picture (Optional)</Label>
+            <div className="space-y-3">
+              <Label htmlFor="profileImage" className="text-sm font-medium text-gray-700">Profile Picture (Optional)</Label>
               <div className="flex items-center space-x-4">
-                {profileImage && (
+                {profileImage ? (
                   <img
                     src={profileImage}
                     alt="Profile preview"
-                    className="w-16 h-16 rounded-full object-cover"
+                    className="w-20 h-20 rounded-2xl object-cover border-4 border-gray-200 shadow-md"
                   />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-r from-gray-100 to-gray-200 flex items-center justify-center border-4 border-gray-200">
+                    <User className="w-8 h-8 text-gray-400" />
+                  </div>
                 )}
                 <div className="flex-1">
                   <Input
@@ -111,17 +122,17 @@ const UserAuth = ({ onClose }: UserAuthProps) => {
                     type="button"
                     variant="outline"
                     onClick={() => document.getElementById('profileImage')?.click()}
-                    className="w-full"
+                    className="w-full h-12 border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors"
                   >
                     <Upload className="w-4 h-4 mr-2" />
-                    Upload Picture
+                    Choose Picture
                   </Button>
                 </div>
               </div>
             </div>
 
-            <Button type="submit" className="w-full">
-              Sign In
+            <Button type="submit" className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+              Create Account & Sign In
             </Button>
           </form>
         </CardContent>
